@@ -9,21 +9,36 @@ const {
   commentData,
 } = require("../db/data/test-data");
 
-describe("GET /api/topics", () => {
+beforeEach(() => {
+  return seed({ topicData, userData, articleData, commentData });
+});
+
+afterAll(() => {
+  db.end();
+});
+
+describe("app", () => {
+  describe("/api", () => {
+    test("should respond with a json object with a message key", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((response) => {
+          expect(response.body.msg).toBe("all ok");
+        });
+    });
+  });
   describe("/api/topics", () => {
-    it("should return an array of topic objects", () => {
+    test("should respond with a json object of topics", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
         .then(({ body }) => {
           const { topics } = body;
-
-          for (let i = 0; i < topics.length; i++) {
-            const topic = topics[i];
-
+          topics.forEach((topic) => {
             expect(topic).toHaveProperty("description", expect.any(String));
             expect(topic).toHaveProperty("slug", expect.any(String));
-          }
+          });
         });
     });
   });
