@@ -13,7 +13,8 @@ app.get("/api", (req, res) => {
 
 app.get("/api/topics", getAllTopics); //create router
 
-app.use("/api/topicz", errorHandler404);
+const topicName = "topicz";
+app.use(`/api/${topicName}`, errorHandler404);
 
 app.use(errorHandler500); //final
 
