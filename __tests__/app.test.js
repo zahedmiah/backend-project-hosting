@@ -8,6 +8,7 @@ const {
   articleData,
   commentData,
 } = require("../db/data/test-data");
+const articles = require("../db/data/test-data/articles");
 
 beforeEach(() => {
   return seed({ topicData, userData, articleData, commentData });
@@ -41,5 +42,17 @@ describe("app", () => {
           });
         });
     });
+  });
+});
+
+describe("server errors", () => {
+  test("responds with 404: not found", () => {
+    return request(app)
+      .get("/api/topicz")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
   });
 });

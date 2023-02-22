@@ -1,4 +1,7 @@
-const { getAllTopicObjects } = require("../models/topicsModel");
+const {
+  getAllTopicObjects,
+  getAllArticleObjects,
+} = require("../models/topicsModel");
 
 exports.getAllTopics = (req, res) => {
   getAllTopicObjects().then((result) => {
