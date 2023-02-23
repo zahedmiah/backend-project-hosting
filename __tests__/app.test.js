@@ -2,6 +2,8 @@ const app = require("../app");
 const request = require("supertest");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
+const sorted = require("jest-sorted");
+
 const {
   topicData,
   userData,
@@ -53,6 +55,19 @@ describe("server errors", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("404 Not Found");
+      });
+  });
+});
+
+describe("/api/articles", () => {
+  test("should return a sorted array of article objects", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+        expect(Array.isArray(articles)).toBe(true);
       });
   });
 });

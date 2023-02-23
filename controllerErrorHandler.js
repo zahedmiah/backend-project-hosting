@@ -5,5 +5,5 @@ exports.errorHandler404 = (req, res, next) => {
 };
 
 exports.errorHandler500 = (err, req, res, next) => {
-  response.status(500).send({ msg: "500 Internal Server Error" });
+  res.status(500).send({ msg: "500 Internal Server Error" });
 };
