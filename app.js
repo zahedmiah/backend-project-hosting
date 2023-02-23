@@ -16,9 +16,8 @@ app.get("/api", (req, res) => {
 app.get("/api/topics", getAllTopics); //create router
 app.get("/api/articles", getAllArticles);
 
-const topicName = "topicz";
-app.use(`/api/:topicName`, errorHandler404);
 
+app.all(`/*`, errorHandler404);
 app.use(errorHandler500); //final
 
 module.exports = app;
