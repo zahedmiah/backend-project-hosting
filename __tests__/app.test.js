@@ -175,7 +175,7 @@ describe("POST /api/articles/:article_id/comments", () => {
     const newComment = {
       username: "butter_bridge",
       body: "This is a new comment",
-      random: "ignored"
+      random: "ignored",
     };
     return request(app)
       .post("/api/articles/1/comments")
@@ -256,12 +256,117 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 
   test("400 error for empty body", () => {
-    const Newcomment = {
-      username: "butter_bridge"
+    const NewComment = {
+      username: "butter_bridge",
     };
     return request(app)
       .post("/api/articles/1/comments")
-      .send(Newcomment)
+      .send(NewComment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id will indicate how much the votes property in the database should be updated by", () => {
+  test("should respond with a 200 status and an updated article", () => {
+    const newArticle = {
+      inc_votes: 1,
+    };
+    return request(app)
+      .patch("/api/article/1")
+      .send(newArticle)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toEqual({
+          article_id: 1,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          votes: 101,
+        });
+      });
+  });
+
+  test("should respond with a 200 status and an updated article with 2 votes", () => {
+    const newArticle = {
+      inc_votes: 2,
+    };
+    return request(app)
+      .patch("/api/article/1")
+      .send(newArticle)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toEqual({
+          article_id: 1,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          votes: 102,
+        });
+      });
+  });
+
+  test("should responds with 404 if invalid article num", () => {
+    const newArticle = {
+      inc_votes: 2,
+    };
+    return request(app)
+      .patch("/api/article/500")
+      .send(newArticle)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
+  });
+
+  test("should responds with 400 if article ID invalid", () => {
+    const newArticle = {
+      inc_votes: 2,
+    };
+    return request(app)
+      .patch("/api/article/1i")
+      .send(newArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+
+  test("should responds with 400 if no votes property", () => {
+    const newArticle = {
+    };
+    return request(app)
+      .patch("/api/article/1")
+      .send(newArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+
+  test("should responds with 400 if votes <= 0", () => {
+    const newArticle = {
+      inc_votes: 0,
+    };
+    return request(app)
+      .patch("/api/article/1")
+      .send(newArticle)
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;

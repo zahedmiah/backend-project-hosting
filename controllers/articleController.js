@@ -2,8 +2,13 @@ const {
   selectAllArticles,
   selectArticleByID,
   selectArticleComments,
-  pushComment
+  pushComment,
+  updateArticle
 } = require("../models/articlesModel");
+
+exports.apiRequest = (req, res) => {
+  res.status(200).send({ msg: "all ok" });
+}
 
 exports.getAllArticles = (req, res, next) => {
   selectAllArticles()
@@ -43,6 +48,18 @@ exports.postComment = (req, res, next) => {
   pushComment(article_id, commentPush)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.updatedArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const input = req.body;
+  updateArticle(article_id, input)
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
