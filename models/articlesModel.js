@@ -38,7 +38,7 @@ exports.selectArticleByID = (article_id) => {
   const queryValues = [article_id];
 
   if (isNaN(article_id)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
+    return Promise.reject({ status: 400, msg: "400 Bad Request" });
   }
 
   return db
@@ -50,9 +50,26 @@ exports.selectArticleByID = (article_id) => {
       if (!result.rows.length) {
         return Promise.reject({
           status: 404,
-          msg: `no article found for article_id${article_id}`,
+          msg: `no articles found for article id:${article_id}`,
         });
       }
       return result.rows[0];
+    });
+};
+
+exports.selectArticleComments = (article_id) => {
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "400 Bad Request" });
+  }
+  return db
+    .query(`SELECT * FROM comments WHERE article_id = $1`, [article_id])
+    .then((result) => {
+      if (!result.rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: `no comments found for ${article_id}`,
+        });
+      }
+      return result.rows;
     });
 };

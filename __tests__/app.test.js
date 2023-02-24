@@ -48,13 +48,22 @@ describe("app", () => {
 });
 
 describe("server errors", () => {
-  test("responds with 404: not found", () => {
+  test("responds with 404: Not Found", () => {
     return request(app)
       .get("/api/topicz")
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("404 Not Found");
+      });
+  });
+  test("responds with 400: Bad Request", () => {
+    return request(app)
+      .get("/api/articles/5i")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
       });
   });
 });
@@ -91,28 +100,48 @@ describe("/api/articles", () => {
         });
       });
   });
-  describe("GET /api/articles/:articles_id", () => {
-    test("should respond with article objects", () => {
-      return request(app)
-        .get("/api/articles/3")
-        .expect(200)
-        .then(({ body }) => {
-          const { article } = body;
-          expect(article.article_id).toBe(3);
-          expect(article).toEqual(
-            expect.objectContaining({
-              article_id: 3,
-              title: 'Eight pug gifs that remind me of mitch',
-              topic: 'mitch',
-              author: 'icellusedkars',
-              body: 'some gifs',
-              created_at: "2020-11-03T09:12:00.000Z",
-              votes: 0,
-              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-              comment_count: '2'
-            })
-          )
-        });
-    });
+});
+
+describe("GET /api/articles/:articles_id", () => {
+  test("should respond with article objects", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_id).toBe(3);
+        expect(article).toEqual(
+          expect.objectContaining({
+            article_id: 3,
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            author: "icellusedkars",
+            body: "some gifs",
+            created_at: "2020-11-03T09:12:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2",
+          })
+        );
+      });
+  });
+  test("responds with 404 if ID not found", () => {
+    return request(app)
+      .get("/api/articles/50999")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
+  });
+  test("responds with 400 if ID is not valid", () => {
+    return request(app)
+      .get("/api/articles/not-an-id")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
   });
 });
