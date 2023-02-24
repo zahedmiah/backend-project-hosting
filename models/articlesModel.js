@@ -2,22 +2,23 @@ const { use } = require("../app");
 const db = require("../db/connection");
 
 exports.selectAllArticles = () => {
+  const text = `
+  SELECT articles.author,
+         articles.title,
+         articles.article_id,
+         articles.topic,
+         articles.created_at,
+         articles.votes,
+         articles.article_img_url,
+         COUNT(comments.comment_id) AS comment_count
+  FROM articles
+  LEFT JOIN comments ON articles.article_id = comments.article_id
+  GROUP BY articles.article_id
+  ORDER BY articles.created_at DESC
+`
   return db
     .query(
-      `
-        SELECT articles.author,
-               articles.title,
-               articles.article_id,
-               articles.topic,
-               articles.created_at,
-               articles.votes,
-               articles.article_img_url,
-               COUNT(comments.comment_id) AS comment_count
-        FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC
-      `
+      text
     )
     .then((result) => {
       return result.rows.map((row) => {
@@ -37,6 +38,7 @@ exports.selectAllArticles = () => {
 
 exports.selectArticleByID = (article_id) => {
   const queryValues = [article_id];
+  const text = `SELECT articles.*, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments on comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`
 
   if (isNaN(article_id)) {
     return Promise.reject({ status: 400, msg: "bad request" });
@@ -44,7 +46,7 @@ exports.selectArticleByID = (article_id) => {
 
   return db
     .query(
-      `SELECT articles.*, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments on comments.article_id = articles.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`,
+      text,
       [article_id]
     )
     .then((result) => {
@@ -61,6 +63,7 @@ exports.selectArticleByID = (article_id) => {
 exports.pushComment = (article_id, newComment) => {
   const { username, body } = newComment;
   const queryValues = [username, body, article_id];
+  const text = "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *"
 
   if (isNaN(article_id)) {
     return Promise.reject({ status: 400, msg: "bad request" });
@@ -72,7 +75,7 @@ exports.pushComment = (article_id, newComment) => {
 
   return db
     .query(
-      "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+      text,
       queryValues
     )
     .then((result) => {
@@ -89,8 +92,33 @@ exports.pushComment = (article_id, newComment) => {
           msg: `no author found for author ${username}`
         });
       } else {
-        console.log(err, "<<<<<<<<<< model err")
         throw err;
       }
     });
 };
+
+exports.updateArticle = (article_id, input) => {
+  const voteIncrement = input.inc_votes;
+  const query = {
+    text: 'UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *',
+    values: [voteIncrement, article_id],
+  };
+  
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  if (isNaN(input.inc_votes)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+
+  if (!input.inc_votes) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  return db.query(query)
+    .then((result) => result.rows[0]);    
+}
+
+
