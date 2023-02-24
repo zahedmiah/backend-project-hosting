@@ -2,11 +2,12 @@ const { getAllTopics } = require("./controllers/topicController");
 const {
   getAllArticles,
   getArticleByID,
-  getArticleComments
+  getArticleComments,
 } = require("./controllers/articleController");
 
 const express = require("express");
 const app = express();
+
 
 const {
   errorHandler404,
@@ -17,7 +18,6 @@ const {
 app.get("/api", (req, res) => {
   res.status(200).send({ msg: "all ok" });
 });
-
 app.get("/api/topics", getAllTopics); //create router
 app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id", getArticleByID)
