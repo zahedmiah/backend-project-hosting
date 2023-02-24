@@ -171,7 +171,32 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("404 error for invalid ID", () => {
+  test("ignores any unnecessary properties on the Newcomment object", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a new comment",
+      random: "ignored"
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject(
+          expect.objectContaining({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "This is a new comment",
+            comment_id: expect.any(Number),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
+      });
+  });
+
+  test("404 error for non existent ID", () => {
     const Newcomment = {
       username: "butter_bridge",
       body: "This is another comment",
@@ -208,6 +233,36 @@ describe("POST /api/articles/:article_id/comments", () => {
     };
     return request(app)
       .post("/api/articles/5i/comments")
+      .send(Newcomment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+
+  test("400 error for empty username", () => {
+    const Newcomment = {
+      username: "",
+      body: "Just another comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(Newcomment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+
+  test("400 error for empty username", () => {
+    const Newcomment = {
+      username: "butter_bridge",
+      body: "",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
       .send(Newcomment)
       .expect(400)
       .then(({ body }) => {

@@ -1,3 +1,4 @@
+const { use } = require("../app");
 const db = require("../db/connection");
 
 exports.selectAllArticles = () => {
@@ -62,6 +63,10 @@ exports.pushComment = (article_id, newComment) => {
   const queryValues = [username, body, article_id];
 
   if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  if (!username || !body) {
     return Promise.reject({ status: 400, msg: "bad request" });
   }
 
