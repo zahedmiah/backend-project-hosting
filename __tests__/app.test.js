@@ -243,7 +243,6 @@ describe("POST /api/articles/:article_id/comments", () => {
 
   test("400 error for empty username", () => {
     const Newcomment = {
-      username: "",
       body: "Just another comment",
     };
     return request(app)
@@ -256,10 +255,9 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 
-  test("400 error for empty username", () => {
+  test("400 error for empty body", () => {
     const Newcomment = {
-      username: "butter_bridge",
-      body: "",
+      username: "butter_bridge"
     };
     return request(app)
       .post("/api/articles/1/comments")
