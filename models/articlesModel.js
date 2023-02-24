@@ -118,7 +118,13 @@ exports.updateArticle = (article_id, input) => {
   }
 
   return db.query(query)
-    .then((result) => result.rows[0]);    
+    .then((result) => {
+      if (!result.rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: `no article found for article_id${article_id}`,
+        });
+      }
+      return result.rows[0];
+    });
 }
-
-

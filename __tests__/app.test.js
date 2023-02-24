@@ -319,6 +319,20 @@ describe("PATCH /api/articles/:article_id will indicate how much the votes prope
       });
   });
 
+  test("should responds with 404 if invalid article num", () => {
+    const newArticle = {
+      inc_votes: 2,
+    };
+    return request(app)
+      .patch("/api/article/500")
+      .send(newArticle)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
+  });
+
   test("should responds with 400 if article ID invalid", () => {
     const newArticle = {
       inc_votes: 2,
