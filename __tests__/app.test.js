@@ -271,14 +271,14 @@ describe("POST /api/articles/:article_id/comments", () => {
 });
 
 describe("PATCH /api/articles/:article_id will indicate how much the votes property in the database should be updated by", () => {
-  test("should respond with a 201 status and an updated article", () => {
+  test("should respond with a 200 status and an updated article", () => {
     const newArticle = {
       inc_votes: 1,
     };
     return request(app)
       .patch("/api/article/1")
       .send(newArticle)
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
         const { article } = body;
         expect(article).toEqual({
@@ -295,14 +295,14 @@ describe("PATCH /api/articles/:article_id will indicate how much the votes prope
       });
   });
 
-  test("should respond with a 201 status and an updated article with 2 votes", () => {
+  test("should respond with a 200 status and an updated article with 2 votes", () => {
     const newArticle = {
       inc_votes: 2,
     };
     return request(app)
       .patch("/api/article/1")
       .send(newArticle)
-      .expect(201)
+      .expect(200)
       .then(({ body }) => {
         const { article } = body;
         expect(article).toEqual({

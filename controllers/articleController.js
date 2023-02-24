@@ -59,7 +59,7 @@ exports.updatedArticle = (req, res, next) => {
   const input = req.body;
   updateArticle(article_id, input)
     .then((article) => {
-      res.status(201).send({ article });
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
