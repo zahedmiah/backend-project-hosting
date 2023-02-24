@@ -36,3 +36,15 @@ exports.getArticleComments = (req, res, next) => {
       next(err);
     });
 };
+
+exports.postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const commentPush = req.body;
+  pushComment(article_id, commentPush)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};

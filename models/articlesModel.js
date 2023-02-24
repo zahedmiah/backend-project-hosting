@@ -38,7 +38,7 @@ exports.selectArticleByID = (article_id) => {
   const queryValues = [article_id];
 
   if (isNaN(article_id)) {
-    return Promise.reject({ status: 400, msg: "400 Bad Request" });
+    return Promise.reject({ status: 400, msg: "bad request" });
   }
 
   return db
@@ -50,26 +50,42 @@ exports.selectArticleByID = (article_id) => {
       if (!result.rows.length) {
         return Promise.reject({
           status: 404,
-          msg: `no articles found for article id:${article_id}`,
+          msg: `no article found for article_id${article_id}`,
         });
       }
       return result.rows[0];
     });
 };
 
-exports.selectArticleComments = (article_id) => {
+exports.pushComment = (article_id, newComment) => {
+  const { username, body } = newComment;
+  const queryValues = [username, body, article_id];
+
   if (isNaN(article_id)) {
-    return Promise.reject({ status: 400, msg: "400 Bad Request" });
+    return Promise.reject({ status: 400, msg: "bad request" });
   }
+
   return db
-    .query(`SELECT * FROM comments WHERE article_id = $1`, [article_id])
+    .query(
+      "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *",
+      queryValues
+    )
     .then((result) => {
-      if (!result.rows.length) {
+      if(!result.rows.length) return Promise.reject({
+        status: 404,
+        msg: `no article found for article_id ${article_id}`,
+      });
+      return result.rows[0];
+    })
+    .catch((err) => {
+      if (err.code === "23503") {
         return Promise.reject({
           status: 404,
-          msg: `no comments found for ${article_id}`,
+          msg: `no author found for author ${username}`
         });
+      } else {
+        console.log(err, "<<<<<<<<<< model err")
+        throw err;
       }
-      return result.rows;
     });
 };

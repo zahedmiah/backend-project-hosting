@@ -145,3 +145,74 @@ describe("GET /api/articles/:articles_id", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("should response with 201 status and posted comment object", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is a new comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject(
+          expect.objectContaining({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "This is a new comment",
+            comment_id: expect.any(Number),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
+      });
+  });
+
+  test("404 error for invalid ID", () => {
+    const Newcomment = {
+      username: "butter_bridge",
+      body: "This is another comment",
+    };
+    return request(app)
+      .post("/api/articles/500/comments")
+      .send(Newcomment)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
+  });
+
+  test("404 error for invalid user", () => {
+    const Newcomment = {
+      username: "John",
+      body: "This is another comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(Newcomment)
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
+      });
+  });
+
+  test("400 error for invalid article", () => {
+    const Newcomment = {
+      username: "John",
+      body: "This is another comment",
+    };
+    return request(app)
+      .post("/api/articles/5i/comments")
+      .send(Newcomment)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("400 Bad Request");
+      });
+  });
+});
