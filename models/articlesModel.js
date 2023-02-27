@@ -65,14 +65,10 @@ exports.pushComment = (article_id, newComment) => {
   const queryValues = [username, body, article_id];
   const text = "INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *"
 
-  if (isNaN(article_id)) {
+  if (isNaN(article_id) || !username || !body) {
     return Promise.reject({ status: 400, msg: "bad request" });
   }
-
-  if (!username || !body) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
-
+  
   return db
     .query(
       text,
@@ -103,17 +99,8 @@ exports.updateArticle = (article_id, input) => {
     text: 'UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *',
     values: [voteIncrement, article_id],
   };
-  
-  if (isNaN(article_id)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
 
-  if (isNaN(input.inc_votes)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
-  }
-
-
-  if (!input.inc_votes) {
+  if (isNaN(article_id) || isNaN(input.inc_votes) || !input.inc_votes) {
     return Promise.reject({ status: 400, msg: "bad request" });
   }
 

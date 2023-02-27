@@ -1,4 +1,5 @@
 const { getAllTopics } = require("./controllers/topicController");
+const { getAllUsers } = require("./controllers/usersController"); 
 const {
   getAllArticles,
   getArticleByID,
@@ -25,6 +26,7 @@ app.patch("/api/article/:article_id", updatedArticle)
 app.get("/api", apiRequest);
 app.get("/api/topics", getAllTopics); //create router
 app.get("/api/articles", getAllArticles);
+app.get("/api/users", getAllUsers);
 app.get("/api/articles/:article_id", getArticleByID)
 app.get("/api/articles/:article_id/comments", getArticleComments)
 app.all(`/*`, errorHandler404);

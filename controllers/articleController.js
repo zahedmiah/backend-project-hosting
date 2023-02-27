@@ -3,12 +3,12 @@ const {
   selectArticleByID,
   selectArticleComments,
   pushComment,
-  updateArticle
+  updateArticle,
 } = require("../models/articlesModel");
 
 exports.apiRequest = (req, res) => {
   res.status(200).send({ msg: "all ok" });
-}
+};
 
 exports.getAllArticles = (req, res, next) => {
   selectAllArticles()
