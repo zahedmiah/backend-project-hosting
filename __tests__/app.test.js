@@ -348,8 +348,7 @@ describe("PATCH /api/articles/:article_id will indicate how much the votes prope
   });
 
   test("should responds with 400 if no votes property", () => {
-    const newArticle = {
-    };
+    const newArticle = {};
     return request(app)
       .patch("/api/article/1")
       .send(newArticle)
@@ -371,6 +370,32 @@ describe("PATCH /api/articles/:article_id will indicate how much the votes prope
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("400 Bad Request");
+      });
+  });
+});
+
+describe("/api/users", () => {
+  test("should respond with a json object of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { result: users } = body;
+        expect.objectContaining({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String),
+        });
+      });
+  });
+
+  test("should respond with a 404", () => {
+    return request(app)
+      .get("/api/userz")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("404 Not Found");
       });
   });
 });
