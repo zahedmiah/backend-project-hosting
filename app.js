@@ -10,7 +10,9 @@ const {
 } = require("./controllers/articleController");
 
 const express = require("express");
+const cors = require('cors');
 const app = express();
+
 
 const {
   errorHandler404,
@@ -19,6 +21,7 @@ const {
 } = require("./controllerErrorHandler");
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/api/articles/:article_id/comments", postComment)
 app.patch("/api/article/:article_id", updatedArticle)
