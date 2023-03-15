@@ -115,3 +115,28 @@ exports.updateArticle = (article_id, input) => {
       return result.rows[0];
     });
 }
+
+exports.selectArticleComments = (article_id) => {
+  const queryValues = [article_id];
+  const text = `
+    SELECT *
+    FROM comments
+    WHERE article_id = $1
+    ORDER BY created_at DESC
+  `;
+
+  if (isNaN(article_id)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
+
+  return db.query(text, queryValues)
+    .then((result) => {
+      if (!result.rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: `no comments found for article_id ${article_id}`,
+        });
+      }
+      return result.rows;
+    });
+};

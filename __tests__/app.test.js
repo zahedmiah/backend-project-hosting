@@ -399,3 +399,25 @@ describe("/api/users", () => {
       });
   });
 });
+
+describe('GET /api/articles/:article_id/comments', () => {
+  test("should respond with a json object of an comments", async () => {
+    const response = await request(app).get("/api/articles/1/comments");
+    const { comments } = response.body;
+
+    expect(response.status).toBe(200);
+    expect(Array.isArray(comments)).toBe(true);
+    expect(comments).toHaveLength(11);
+
+    comments.forEach((comment) => {
+      expect(comment).toMatchObject({
+        comment_id: expect.any(Number),
+        votes: expect.any(Number),
+        created_at: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        article_id: expect.any(Number),
+      });
+    });
+  });
+});
